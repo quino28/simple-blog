@@ -2,6 +2,11 @@ controllers:
     resource: ../src/Controller/
     type: annotation
 
-kernel:
-    resource: ../src/Kernel.php
-    type: annotation
+article_index:
+    path: /
+    controller: App\Controller\ArticleController::index
+
+article_show:
+    path:       /article/{id}
+    controller: App\Controller\ArticleController::show
+    methods:    GET
