@@ -19,6 +19,11 @@ class User
     #[ORM\Column(type: 'string', length: 255)]
     private $password;
 
+    public function __toString(): string
+    {
+        return (string) $this->getName();
+    }
+
     public function getId(): ?int
     {
         return $this->id;

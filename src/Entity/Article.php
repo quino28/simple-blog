@@ -3,9 +3,14 @@
 namespace App\Entity;
 
 use App\Repository\ArticleRepository;
+use DateTime;
+use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 
+date_default_timezone_set('Europe/Tallinn');
+
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Article
 {
     #[ORM\Id]
@@ -27,9 +32,6 @@ class Article
 
     #[ORM\Column(type: 'datetime')]
     private $updated_at;
-
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private $deleted_at;
 
     public function getId(): ?int
     {
@@ -96,15 +98,27 @@ class Article
         return $this;
     }
 
-    public function getDeletedAt(): ?\DateTimeInterface
+    #[ORM\PrePersist]
+    public function setUserIdValue()
     {
-        return $this->deleted_at;
+        $this->user_id = 1;
     }
 
-    public function setDeletedAt(?\DateTimeInterface $deleted_at): self
+    #[ORM\PrePersist]
+    public function setCreatedAtValue()
     {
-        $this->deleted_at = $deleted_at;
+        $this->created_at = new DateTime();
+    }
 
-        return $this;
+    #[ORM\PrePersist]
+    public function setUpdatedAtValue()
+    {
+        $this->updated_at = new DateTime();
+    }
+
+    #[ORM\PreUpdate]
+    public function updateUpdatedAtValue(LifecycleEventArgs $event)
+    {
+        $this->updated_at = new DateTime();
     }
 }
