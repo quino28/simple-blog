@@ -18,7 +18,7 @@ class BaseController extends AbstractDashboardController
     public function index(): Response
     {
         $routeBuilder = $this->container->get(AdminUrlGenerator::class);
-        $url = $routeBuilder->setController(UserController::class)->generateUrl();
+        $url = $routeBuilder->setController(ArticleController::class)->generateUrl();
         return $this->redirect($url);
 
         // Option 1. You can make your dashboard redirect to some common page of your backend
@@ -46,7 +46,7 @@ class BaseController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
-        yield MenuItem::linktoRoute('Home', 'fas fa-home', 'homepage');
+        yield MenuItem::linktoRoute('Home', 'fas fa-home', 'index');
         yield MenuItem::linkToCrud('User', 'fas fa-user', User::class);
         yield MenuItem::linkToCrud('Article', 'fas fa-newspaper', Article::class);
         yield MenuItem::linkToCrud('Comment', 'fas fa-comments', Comment::class);

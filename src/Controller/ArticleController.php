@@ -6,11 +6,15 @@ use App\Entity\Article;
 // use App\Form\ArticleFormType;
 // use App\Form\CommentFormType;
 // use Doctrine\Persistence\ManagerRegistry;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 // use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 // use Symfony\Component\HttpFoundation\Response;
 // use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -26,13 +30,29 @@ class ArticleController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        return [
-            IdField::new('userId')->hideOnForm(),
-            'title',
-            'text',
-            // DateTimeField::new('updatedAt')->hideOnIndex()->hideOnForm(),
-        ];
+        yield IdField::new('userId')
+            ->hideOnIndex()
+            ->hideOnForm();
+        yield AssociationField::new('user')
+            ->hideOnForm();
+        yield TextField::new('title');
+        yield TextField::new('text');
+        yield DateTimeField::new('createdAt')
+            ->hideOnIndex()
+            ->hideOnForm();
+        yield DateTimeField::new('updatedAt')
+            ->hideOnIndex()
+            ->hideOnForm();
     }
+
+    // public function configureCrud(Crud $crud): Crud
+    // {
+        // return $crud
+            // ->setEntityLabelInSingular('...')
+            // ->setDateFormat('...')
+        // ;
+    // }
+
     // public function show(ManagerRegistry $doctrine, int $id): Response
     // {
         // $entityManager = $doctrine->getManager();
@@ -52,6 +72,11 @@ class ArticleController extends AbstractCrudController
         // ]);
     // }
 
+    public function configureActions(Actions $actions): Actions
+    {
+        return $actions
+            ->add(Crud::PAGE_INDEX, Action::DETAIL);
+    }
 /*
  *     public function edit(ManagerRegistry $doctrine, int $id): Response
  *     {

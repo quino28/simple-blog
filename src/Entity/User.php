@@ -21,7 +21,7 @@ class User
 
     public function __toString(): string
     {
-        return (string) $this->getName();
+        return $this->name;
     }
 
     public function getId(): ?int

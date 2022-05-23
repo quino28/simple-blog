@@ -17,12 +17,23 @@ class Comment
     #[ORM\Column(type: 'integer')]
     private $user_id;
 
+    #[ORM\Column(type: 'integer')]
+    private $article_id;
+
     #[ORM\Column(type: 'text')]
     #[Assert\NotBlank]
     private $body;
 
     #[ORM\Column(type: 'datetime')]
     private $created_at;
+
+    #[ORM\ManyToOne(targetEntity: Article::class, inversedBy: 'comments')]
+    #[ORM\JoinColumn(nullable: false)]
+    private $article;
+
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'comments')]
+    #[ORM\JoinColumn(nullable: false)]
+    private $user;
 
     public function getId(): ?int
     {
@@ -37,6 +48,18 @@ class Comment
     public function setUserId(int $user_id): self
     {
         $this->user_id = $user_id;
+
+        return $this;
+    }
+
+    public function getArticleId(): ?int
+    {
+        return $this->article_id;
+    }
+
+    public function setArticleId(int $article_id): self
+    {
+        $this->article_id = $article_id;
 
         return $this;
     }
@@ -61,6 +84,30 @@ class Comment
     public function setCreatedAt(\DateTimeInterface $created_at): self
     {
         $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    public function getArticle(): ?Article
+    {
+        return $this->article;
+    }
+
+    public function setArticle(?Article $article): self
+    {
+        $this->article = $article;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }
