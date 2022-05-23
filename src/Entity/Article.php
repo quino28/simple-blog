@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Entity\User;
 use App\Repository\ArticleRepository;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -39,7 +38,7 @@ class Article
     #[ORM\OneToMany(mappedBy: 'article', targetEntity: Comment::class, orphanRemoval: true)]
     private $comments;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'Articles')]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'articles')]
     #[ORM\JoinColumn(nullable: false)]
     private $user;
 

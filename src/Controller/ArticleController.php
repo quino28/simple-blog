@@ -31,18 +31,15 @@ class ArticleController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('userId')
-            ->hideOnIndex()
-            ->hideOnForm();
+            ->onlyOnDetail();
         yield AssociationField::new('user')
             ->hideOnForm();
         yield TextField::new('title');
         yield TextField::new('text');
         yield DateTimeField::new('createdAt')
-            ->hideOnIndex()
-            ->hideOnForm();
+            ->onlyOnDetail();
         yield DateTimeField::new('updatedAt')
-            ->hideOnIndex()
-            ->hideOnForm();
+            ->onlyOnDetail();
     }
 
     // public function configureCrud(Crud $crud): Crud
