@@ -1,0 +1,26 @@
+{% extends '@!EasyAdmin/layout.html.twig' %}
+{# {% extends '@!EasyAdmin/crud/detail.html.twig' %} #}
+{% block content_footer_wrapper %}
+    <h2>Title</h2>
+    <p>{{ article.title }}</p>
+    <h2>Text</h2>
+    <p>{{ article.text }}</p>
+    <h2>Comment</h2>
+    {% if comments is empty %}
+        <p>No comment</p>
+    {% else %}
+        <ul>
+        {% for comment in comments %}
+            <li>
+                {{ comment.body }}
+            </li>
+            <i class="fa-solid fa-eye-slash" style="cursor: pointer;"></i>
+            <form action="{{ path('comment_delete', { 'id': comment.id }) }}" method="post" style="display: inline-block;">
+                <button name="id">delete</button>
+            </form>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    <h2>Add your comment</h2>
+    {{ form(comment_form) }}
+{% endblock %}

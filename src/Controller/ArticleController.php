@@ -20,8 +20,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 // use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-// use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 // use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 use Psr\Log\LoggerInterface;
@@ -67,7 +68,7 @@ class ArticleController extends AbstractCrudController
             ->reorder(Crud::PAGE_INDEX, [Action::DETAIL, Action::EDIT, 'Comment']);
     }
 
-    public function showComment(Request $request, CommentRepository $commentRepository, AdminContext $context, ManagerRegistry $doctrine, LoggerInterface $logger)
+    public function showComment(Request $request, CommentRepository $commentRepository, AdminContext $context, ManagerRegistry $doctrine)
     {
         $article = $context->getEntity()->getInstance();
         $entityManager = $doctrine->getManager();
@@ -97,5 +98,22 @@ class ArticleController extends AbstractCrudController
             'comments'     => $comments,
             'comment_form' => $form->createView(),
         ]);
+    }
+
+    public function deleteComment(ManagerRegistry $doctrine, Request $request)
+    {
+        $comment = $doctrine->getRepository(Comment::class)->find($request->query->get('id'));
+        $article = $comment->getArticle();
+
+        $entityManager = $doctrine->getManager();
+        $entityManager->remove($comment);
+        $entityManager->flush();
+
+        $url = $this->adminUrlGenerator
+            ->setController(ArticleController::class)
+            ->setAction('showComment')
+            ->setEntityId($article->getId())
+            ->generateUrl();
+        return new RedirectResponse($url);
     }
 }
