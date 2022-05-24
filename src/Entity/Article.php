@@ -113,20 +113,10 @@ class Article
     }
 
     #[ORM\PrePersist]
-    public function setUserIdValue()
+    public function prePersist()
     {
         $this->user_id = 1;
-    }
-
-    #[ORM\PrePersist]
-    public function setCreatedAtValue()
-    {
         $this->created_at = new DateTime();
-    }
-
-    #[ORM\PrePersist]
-    public function setUpdatedAtValue()
-    {
         $this->updated_at = new DateTime();
     }
 

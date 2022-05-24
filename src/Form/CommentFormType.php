@@ -13,7 +13,9 @@ class CommentFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('body')
+            ->add('body', null, [
+                'required' => true,
+            ])
             ->add('submit', SubmitType::class)
         ;
     }

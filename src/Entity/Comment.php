@@ -3,19 +3,18 @@
 namespace App\Entity;
 
 use App\Repository\CommentRepository;
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Comment
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private $id;
-
-    #[ORM\Column(type: 'integer')]
-    private $user_id;
 
     #[ORM\Column(type: 'integer')]
     private $article_id;
@@ -31,25 +30,9 @@ class Comment
     #[ORM\JoinColumn(nullable: false)]
     private $article;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'comments')]
-    #[ORM\JoinColumn(nullable: false)]
-    private $user;
-
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getUserId(): ?int
-    {
-        return $this->user_id;
-    }
-
-    public function setUserId(int $user_id): self
-    {
-        $this->user_id = $user_id;
-
-        return $this;
     }
 
     public function getArticleId(): ?int
@@ -100,15 +83,9 @@ class Comment
         return $this;
     }
 
-    public function getUser(): ?User
+    #[ORM\PrePersist]
+    public function prePersist()
     {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): self
-    {
-        $this->user = $user;
-
-        return $this;
+        $this->created_at = new DateTime();
     }
 }
