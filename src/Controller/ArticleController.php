@@ -10,6 +10,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
@@ -39,6 +40,12 @@ class ArticleController extends AbstractCrudController
         return Article::class;
     }
 
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+            ->setSearchFields(null);
+    }
+
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('userId')
@@ -55,13 +62,12 @@ class ArticleController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
-        $viewComment = Action::new('Comment', null)
-            ->linkToCrudAction('showComment');
+        $viewDetail = Action::new('Show', null)
+            ->linkToCrudAction('showDetail');
 
         return $actions
-            ->add(Crud::PAGE_INDEX, Action::DETAIL)
-            ->add(Crud::PAGE_INDEX, $viewComment)
-            ->reorder(Crud::PAGE_INDEX, [Action::DETAIL, Action::EDIT, 'Comment']);
+            ->add(Crud::PAGE_INDEX, $viewDetail)
+            ->reorder(Crud::PAGE_INDEX, ['Show', Action::EDIT]);
     }
 
     public function createEntity(string $entityFqcn)
@@ -75,7 +81,7 @@ class ArticleController extends AbstractCrudController
         return $article;
     }
 
-    public function showComment(Request $request, CommentRepository $commentRepository, AdminContext $context, ManagerRegistry $doctrine)
+    public function showDetail(Request $request, CommentRepository $commentRepository, AdminContext $context, ManagerRegistry $doctrine)
     {
         $article       = $context->getEntity()->getInstance();
         $entityManager = $doctrine->getManager();
@@ -89,36 +95,54 @@ class ArticleController extends AbstractCrudController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $comment->setArticle($article);
+            $comment->setIsHide(false);
             $this->entityManager->persist($comment);
             $this->entityManager->flush();
 
             $url = $this->adminUrlGenerator
                 ->setController(ArticleController::class)
-                ->setAction('showComment')
+                ->setAction('showDetail')
                 ->setEntityId($article->getId())
                 ->generateUrl();
             return $this->redirect($url);
         }
 
-        return $this->render('comment/show.html.twig', [
+        return $this->render('article/detail.html.twig', [
             'article'      => $article,
             'comments'     => $comments,
             'comment_form' => $form->createView(),
         ]);
     }
 
+    public function showHideComment(ManagerRegistry $doctrine, Request $request)
+    {
+        $entityManager = $doctrine->getManager();
+        $comment       = $entityManager->getRepository(Comment::class)->find($request->query->get('id'));
+        $article       = $comment->getArticle();
+
+        $comment->setIsHide(!$comment->isIsHide());
+        $entityManager->flush();
+
+        $url = $this->adminUrlGenerator
+            ->setController(ArticleController::class)
+            ->setAction('showDetail')
+            ->setEntityId($article->getId())
+            ->generateUrl();
+        return new RedirectResponse($url);
+    }
+
     public function deleteComment(ManagerRegistry $doctrine, Request $request)
     {
-        $comment = $doctrine->getRepository(Comment::class)->find($request->query->get('id'));
-        $article = $comment->getArticle();
-
         $entityManager = $doctrine->getManager();
+        $comment       = $entityManager->getRepository(Comment::class)->find($request->query->get('id'));
+        $article       = $comment->getArticle();
+
         $entityManager->remove($comment);
         $entityManager->flush();
 
         $url = $this->adminUrlGenerator
             ->setController(ArticleController::class)
-            ->setAction('showComment')
+            ->setAction('showDetail')
             ->setEntityId($article->getId())
             ->generateUrl();
         return new RedirectResponse($url);

@@ -6,7 +6,12 @@ index:
     path: /
     controller: App\Controller\BaseController::index
 
-comment_delete:
+show_hide_comment:
+    path:       /article/comment/{$id}/showHide
+    controller: App\Controller\ArticleController::showHideComment
+    methods:    POST
+
+delete_comment:
     path:       /article/comment/{$id}/delete
     controller: App\Controller\ArticleController::deleteComment
     methods:    POST

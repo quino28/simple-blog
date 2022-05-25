@@ -1,0 +1,77 @@
+{% extends '@!EasyAdmin/layout.html.twig' %}
+
+{% block content_header_wrapper %}
+    <section class="content-header">
+        <div class="content-header-title">
+            <h1 class="title">{{ ('article#' ~ article.id) | trans }}</h1>
+        </div>
+        <div class="form-group">
+            <div class="form-widget">
+                <i class="fas fa-search content-search-icon"></i>
+
+                <label class="content-search-label" data-value="{{ app.request.get('query') }}">
+                    <form action="" method="get" style="display: inline-block;">
+                        <input class="form-control {{ app.request.get('query') is null ? 'is-blank' }}" type="search" name="query" value="{{ app.request.get('query') ?? '' }}" placeholder="Search" spellcheck="false" autocorrect="off" autofocus="autofocus">
+                    </form>
+                </label>
+
+                {# {% if app.request.get('query') %} #}
+                {# <a href="{{ ea_url().unset('query') }}" class="content-search-reset"> #}
+                    {# <i class="fas fa-fw fa-times"></i> #}
+                {# </a> #}
+                {# {% endif %} #}
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block main %}
+    <div class="form-panel">
+        <div class="form-panel-body show">
+            <dl class="datalist">
+                <div class="data-row">
+                    <dt>User Id</dt>
+                    <dd>{{ article.getUserId() }}</dd>
+                </div>
+                <div class="data-row">
+                    <dt>Title</dt>
+                    <dd>{{ article.title }}</dd>
+                </div>
+                <div class="data-row">
+                    <dt>Text</dt>
+                    <dd>{{ article.text }}</dd>
+                </div>
+                <div class="data-row">
+                    <dt>Created_at</dt>
+                    <dd>{{ article.getCreatedAt() | date("d/m/Y g:i:sA") }}</dd>
+                </div>
+                <div class="data-row">
+                    <dt>Updated_at</dt>
+                    <dd>{{ article.getUpdatedAt() | date("d/m/Y g:i:sA") }}</dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+{% endblock %}
+{% block content_footer_wrapper %}
+    <h2>Comment</h2>
+    {% if comments is empty %}
+        <p>No comment</p>
+    {% else %}
+        <ul>
+        {% for comment in comments %}
+            <li>
+                {% if comment.isIsHide() %}*****{% else %}{{ comment.body }}{% endif %}
+            </li>
+            <form action="{{ path('show_hide_comment', { 'id': comment.id }) }}" method="post" style="display: inline-block;">
+                <button name="id">{% if comment.isIsHide() %}show{% else %}hide{%endif%}</button>
+            </form>
+            <form action="{{ path('delete_comment', { 'id': comment.id }) }}" method="post" style="display: inline-block;">
+                <button name="id">delete</button>
+            </form>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    <h2>Add your comment</h2>
+    {{ form(comment_form) }}
+{% endblock %}

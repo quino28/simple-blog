@@ -23,6 +23,9 @@ class Comment
     #[Assert\NotBlank]
     private $body;
 
+    #[ORM\Column(type: 'boolean')]
+    private $is_hide;
+
     #[ORM\Column(type: 'datetime')]
     private $created_at;
 
@@ -55,6 +58,18 @@ class Comment
     public function setBody(string $body): self
     {
         $this->body = $body;
+
+        return $this;
+    }
+
+    public function isIsHide(): ?bool
+    {
+        return $this->is_hide;
+    }
+
+    public function setIsHide(bool $is_hide): self
+    {
+        $this->is_hide = $is_hide;
 
         return $this;
     }
