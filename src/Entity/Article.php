@@ -115,7 +115,6 @@ class Article
     #[ORM\PrePersist]
     public function prePersist()
     {
-        $this->user_id = 1;
         $this->created_at = new DateTime();
         $this->updated_at = new DateTime();
     }

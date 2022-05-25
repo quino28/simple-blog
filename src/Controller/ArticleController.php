@@ -3,7 +3,6 @@ namespace App\Controller;
 
 use App\Entity\Article;
 use App\Entity\Comment;
-// use App\Form\ArticleFormType;
 use App\Form\CommentFormType;
 use App\Repository\CommentRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,23 +18,20 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
-// use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-// use Symfony\Component\Validator\Validator\ValidatorInterface;
-
-use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Core\Security;
 
 class ArticleController extends AbstractCrudController
 {
     private $twig;
     private $entityManager;
 
-    public function __construct(AdminUrlGenerator $adminUrlGenerator, EntityManagerInterface $entityManager)
+    public function __construct(AdminUrlGenerator $adminUrlGenerator, EntityManagerInterface $entityManager, Security $security)
     {
         $this->adminUrlGenerator = $adminUrlGenerator;
         $this->entityManager     = $entityManager;
+        $this->security          = $security;
     }
 
     public static function getEntityFqcn(): string
@@ -68,11 +64,22 @@ class ArticleController extends AbstractCrudController
             ->reorder(Crud::PAGE_INDEX, [Action::DETAIL, Action::EDIT, 'Comment']);
     }
 
+    public function createEntity(string $entityFqcn)
+    {
+        $article = new Article();
+        $user    = $this->security->getUser();
+
+        $article->setUser($user);
+        $article->setUserId($user->getId());
+
+        return $article;
+    }
+
     public function showComment(Request $request, CommentRepository $commentRepository, AdminContext $context, ManagerRegistry $doctrine)
     {
-        $article = $context->getEntity()->getInstance();
+        $article       = $context->getEntity()->getInstance();
         $entityManager = $doctrine->getManager();
-        $comments = $entityManager->getRepository(Comment::class)->findBy([
+        $comments      = $entityManager->getRepository(Comment::class)->findBy([
             'article_id' => $article->getId(),
         ]);
 
