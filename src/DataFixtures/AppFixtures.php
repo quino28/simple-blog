@@ -8,7 +8,6 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Psr\Log\LoggerInterface;
 
 const CREATE_NUMBER   = 10;
 const LOREM_IPSUM_URL = 'http://asdfast.beobit.net/api/';
@@ -41,6 +40,7 @@ class AppFixtures extends Fixture
         $users         = $entityManager->getRepository(User::class)->findAll();
         $count         = 0;
         foreach ($users as $user) {
+            var_dump($user->getName());
             $count++;
             $article  = new Article();
             $response = curl_exec($ch);
